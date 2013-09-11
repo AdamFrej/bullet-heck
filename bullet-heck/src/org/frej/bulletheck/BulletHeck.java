@@ -1,6 +1,5 @@
 package org.frej.bulletheck;
 
-import org.frej.bulletheck.Screens.GameScreen;
 import org.frej.bulletheck.Screens.MainMenu;
 
 import com.badlogic.gdx.Game;
@@ -12,7 +11,7 @@ public class BulletHeck extends Game{
 
 	@Override
 	public void create() {
-		setScreen(new GameScreen());
+		setScreen(new MainMenu(this));
 		
 	}
 }

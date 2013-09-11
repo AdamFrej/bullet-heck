@@ -33,16 +33,17 @@ public class WorldRenderer {
 		
 		batch.begin();
 		batch.draw(playerTexture,player.getBody().getPosition().x,player.getBody().getPosition().y);
-		for(Entity bullet:world.getBullets()){
+		for(Entity bullet:world.getBullets())
 			batch.draw(bulletTexture,bullet.getBody().getPosition().x,bullet.getBody().getPosition().y);
-		}
-		//batch.draw(bulletTexture,bullet.getBody().getPosition().x,bullet.getBody().getPosition().y);
+	
+	
 		batch.end();
 		
 	}
 
 	public void dispose(){
 		playerTexture.dispose();
+		bulletTexture.dispose();
 		batch.dispose();
 		
 	}

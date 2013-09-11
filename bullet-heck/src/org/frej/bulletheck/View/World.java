@@ -15,6 +15,7 @@ public class World {
 	private static final float PALYER_SPEED = 150f;
 	private static final float BULLET_SPEED = 250f;
 	private static final float BULLET_MAX_DISTANCE = 150f;//(Gdx.graphics.getHeight()+Gdx.graphics.getWidth())/2;
+	
 	private Entity player;
 	private Array<Entity> bullets;
 

@@ -61,8 +61,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void dispose() {
-		// TODO Automatycznie generowany szkielet metody
-
+		wr.dispose();
 	}
 
 }
