@@ -37,7 +37,7 @@ public class Decay {
 	}
 
 	public boolean isDecayed() {
-		if (entity.getBody().getPosition().cpy().dst(origin)>maxDistance)
+		if (entity.getBody().getPosition().dst(origin)>maxDistance)
 			return true;
 
 		return false;

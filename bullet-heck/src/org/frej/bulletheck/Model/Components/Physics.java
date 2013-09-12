@@ -21,19 +21,19 @@ public class Physics {
 		this.velocity=velocity;
 		this.speed=speed;
 	}
-	/**
+	/*
 	 * @return wartość velocity
-	 */
+	 
 	public Vector2 getVelocity() {
 		return velocity;
 	}
-	/**
+	
 	 * @param velocity wartość velocity do ustawienia
-	 */
+	 
 	public void setVelocity(Vector2 velocity) {
 		this.velocity = velocity;
 	}
-	/**
+	
 	 * @return wartość speed
 	 */
 	public float getSpeed() {
@@ -46,14 +46,24 @@ public class Physics {
 		this.speed = speed;
 	}
 	public void update(){
-		entity.getBody().getPosition().add(velocity.cpy().scl(speed*Gdx.graphics.getDeltaTime()));
-		entity.getBody().getBounds().x = entity.getBody().getPosition().x; 
-		entity.getBody().getBounds().y = entity.getBody().getPosition().y;
+		entity.getBody().setPosition(entity.getBody().getPosition().add(velocity.cpy().scl(speed*Gdx.graphics.getDeltaTime())));
+		
+		if(velocity.y>0)entity.getBody().setFace(Body.UP);
+		else entity.getBody().setFace(Body.DOWN);
+		
+		if(velocity.x>0)entity.getBody().setFace(Body.RIGHT);
+		else if(velocity.x<0) entity.getBody().setFace(Body.LEFT);
+		
+		if(velocity.x==0&&velocity.y==0)entity.getBody().setFace(Body.STOP);
 		
 	}
-	public void moveTo(Vector2 newPosition){
-		entity.getBody().getPosition().lerp(newPosition, 0.1f);
-		this.update();
+	public void setVelocityY(float y) {
+		velocity.y=y;
+		
+	}
+	public void setVelocityX(float x) {
+		velocity.x=x;
+		
 	}
 	
 }

@@ -4,9 +4,15 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Body {
+	public static final int DOWN = 0;
+	public static final int UP = 1;
+	public static final int LEFT = 2;
+	public static final int RIGHT = 3;
+	public static final int STOP = 4;
 	private Vector2 position;
 	private float width;
 	private float height;
+	private int face;
 	private Rectangle bounds;
 	
 	
@@ -22,20 +28,30 @@ public class Body {
 		this.width = width;
 		this.height = height;
 		bounds= new Rectangle(position.x,position.y,width,height);
+		this.face=STOP;
 	}
 
 	/**
 	 * @return wartość position
 	 */
-	public Vector2 getPosition() {
-		return position;
+	Vector2 getPosition() {
+		return position.cpy();
 	}
-
+	
+	
+	public float getX(){
+		return position.x;
+	}
 	/**
 	 * @param position wartość position do ustawienia
 	 */
-	public void setPosition(Vector2 position) {
+	void setPosition(Vector2 position) {
 		this.position = position;
+		bounds= new Rectangle(position.x,position.y,width,height);
+	}
+
+	public float getY(){
+		return position.y;
 	}
 
 	/**
@@ -50,6 +66,7 @@ public class Body {
 	 */
 	public void setWidth(float width) {
 		this.width = width;
+		bounds= new Rectangle(position.x,position.y,width,height);
 	}
 
 	/**
@@ -64,6 +81,7 @@ public class Body {
 	 */
 	public void setHeight(float height) {
 		this.height = height;
+		bounds= new Rectangle(position.x,position.y,width,height);
 	}
 
 	/**
@@ -74,11 +92,19 @@ public class Body {
 	}
 
 	/**
-	 * @param bounds wartość bounds do ustawienia
+	 * @return wartość face
 	 */
-	public void setBounds(Rectangle bounds) {
-		this.bounds = bounds;
+	public int getFace() {
+		return face;
 	}
+
+	/**
+	 * @param face wartość face do ustawienia
+	 */
+	public void setFace(int face) {
+		this.face = face;
+	}
+	
 	
 
 }

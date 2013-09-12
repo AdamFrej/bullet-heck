@@ -37,7 +37,7 @@ public class MainMenu implements Screen{
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(0.188f, 0.204f, 0.427f,1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		stage.act(delta);
@@ -71,22 +71,22 @@ public class MainMenu implements Screen{
 		quitStyle.font = font;
 
 		TextButton play = new TextButton("Play", playStyle);
-		play.setWidth(2*96);
-		play.setHeight(2*32);
-		play.setX(Gdx.graphics.getWidth()/8);
-		play.setY(Gdx.graphics.getHeight()-4*32);
+		play.setWidth(4*96);
+		play.setHeight(4*32);
+		play.setX(Gdx.graphics.getWidth()/2-2*96);
+		play.setY(Gdx.graphics.getHeight()-10*32);
 		
-		TextButton options = new TextButton("Options", optionsStyle);
-		options.setWidth(2*96);
-		options.setHeight(2*32);
-		options.setX(Gdx.graphics.getWidth()/8);
-		options.setY(Gdx.graphics.getHeight()-6*32);
+		TextButton options = new TextButton("  options", optionsStyle);
+		options.setWidth(4*96);
+		options.setHeight(4*32);
+		options.setX(Gdx.graphics.getWidth()/2-2*96);
+		options.setY(Gdx.graphics.getHeight()-14*32);
 		
-		TextButton quit = new TextButton("Quit", quitStyle);
-		quit.setWidth(2*96);
-		quit.setHeight(2*32);
-		quit.setX(Gdx.graphics.getWidth()/8);
-		quit.setY(Gdx.graphics.getHeight()-8*32);
+		TextButton quit = new TextButton("Quit ", quitStyle);
+		quit.setWidth(4*96);
+		quit.setHeight(4*32);
+		quit.setX(Gdx.graphics.getWidth()/2-2*96);
+		quit.setY(Gdx.graphics.getHeight()-18*32);
 		
 		play.addListener(new InputListener(){
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
@@ -96,11 +96,21 @@ public class MainMenu implements Screen{
 				game.setScreen(new GameScreen());
 			}
 		});
+		quit.addListener(new InputListener(){
+			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button){
+				return true;
+			}
+			public void touchUp(InputEvent event, float x, float y, int pointer, int button){
+				Gdx.app.exit();
+			}
+		});
 		
-		LabelStyle ls = new LabelStyle(font,Color.BLACK);
+		
+		
+		LabelStyle ls = new LabelStyle(font,Color.WHITE);
 		Label gameName = new Label("bullet heck",ls);
 		gameName.setX(0);
-		gameName.setY(Gdx.graphics.getHeight()/2+100);
+		gameName.setY(Gdx.graphics.getHeight()*0.85f);
 		gameName.setWidth(width);
 		gameName.setAlignment(Align.center);
 		
@@ -119,6 +129,7 @@ public class MainMenu implements Screen{
 		skin.addRegions(atlas);
 		font = new BitmapFont(Gdx.files.internal("data/visitor.fnt"),
 				false);
+		//font.setScale(0.7f);
 	}
 
 	@Override
