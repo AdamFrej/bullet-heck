@@ -45,9 +45,10 @@ public class Body {
 	/**
 	 * @param position wartość position do ustawienia
 	 */
-	void setPosition(Vector2 position) {
+	public void setPosition(Vector2 position) {
 		this.position = position;
 		bounds= new Rectangle(position.x,position.y,width,height);
+		//System.out.println(position);
 	}
 
 	public float getY(){

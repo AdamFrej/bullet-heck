@@ -17,8 +17,10 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 public class WorldRenderer {
 	private World world;
 	private Entity player;
+	private Entity enemy;
 
 	private Texture playerTexture;
+	private Texture enemyTexture;
 	private SpriteBatch batch;
 	private Texture bulletTexture;
 	private TiledMap map;
@@ -48,10 +50,13 @@ public class WorldRenderer {
 	 * @param world
 	 */
 	public WorldRenderer(World world) {
+
 		this.world = world;
-		player = this.world.getPlayer();
+		player = world.getPlayer();
+		enemy = world.getEnemy();
 
 		playerTexture = new Texture("data/test.png");// rycerzp.png");
+		enemyTexture = new Texture("data/rycerzp.png");
 		bulletTexture = new Texture("data/pocisk.png");
 
 		map = new TmxMapLoader().load("data/mapka.tmx");
@@ -128,6 +133,7 @@ public class WorldRenderer {
 			currentFrame = downAnimation.getKeyFrame(0);
 			break;
 		}
+
 		batch.begin();
 		batch.draw(currentFrame, (Gdx.graphics.getWidth() - player.getBody()
 				.getWidth()) / 2, (Gdx.graphics.getHeight() - player.getBody()
@@ -135,8 +141,21 @@ public class WorldRenderer {
 		for (Entity bullet : world.getBullets())
 			batch.draw(bulletTexture, bullet.getBody().getX(), bullet.getBody()
 					.getY());
+		batch.draw(enemyTexture, enemyX(), enenmyY());
 		batch.end();
 
+	}
+
+	private float enenmyY() {
+		return enemy.getBody().getY()
+				+ (Gdx.graphics.getHeight() - enemy.getBody().getHeight()) / 2
+				- mapCam.position.y / unitScale;
+	}
+
+	private float enemyX() {
+		return enemy.getBody().getX()
+				+ (Gdx.graphics.getWidth() - enemy.getBody().getWidth()) / 2
+				- mapCam.position.x / unitScale;
 	}
 
 	public void dispose() {

@@ -1,5 +1,6 @@
 package org.frej.bulletheck.Screens;
 
+import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.View.World;
 import org.frej.bulletheck.View.WorldRenderer;
 
@@ -17,8 +18,8 @@ public class GameScreen implements Screen {
 	 * @param world
 	 * @param wr
 	 */
-	public GameScreen() {
-		this.world = new World();
+	public GameScreen(BulletHeck game) {
+		this.world = new World(game);
 		this.wr = new WorldRenderer(world);
 	}
 

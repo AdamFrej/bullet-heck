@@ -46,7 +46,7 @@ public class Physics {
 		this.speed = speed;
 	}
 	public void update(){
-		entity.getBody().setPosition(entity.getBody().getPosition().add(velocity.cpy().scl(speed*Gdx.graphics.getDeltaTime())));
+		entity.getBody().setPosition(nextPosition());
 		
 		if(velocity.y>0)entity.getBody().setFace(Body.UP);
 		else entity.getBody().setFace(Body.DOWN);
@@ -57,6 +57,10 @@ public class Physics {
 		if(velocity.x==0&&velocity.y==0)entity.getBody().setFace(Body.STOP);
 		
 	}
+	public Vector2 nextPosition() {
+		return entity.getBody().getPosition().add(velocity.cpy().scl(speed*Gdx.graphics.getDeltaTime()));
+	}
+	
 	public void setVelocityY(float y) {
 		velocity.y=y;
 		

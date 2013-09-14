@@ -93,7 +93,7 @@ public class MainMenu implements Screen{
 				return true;
 			}
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button){
-				game.setScreen(new GameScreen());
+				game.setScreen(new GameScreen(game));
 			}
 		});
 		quit.addListener(new InputListener(){
@@ -134,7 +134,9 @@ public class MainMenu implements Screen{
 
 	@Override
 	public void hide() {
-		// TODO Automatycznie generowany szkielet metody
+		Gdx.input.setInputProcessor(null);
+		this.dispose();
+
 		
 	}
 

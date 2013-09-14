@@ -1,38 +1,57 @@
 package org.frej.bulletheck.View;
 
+import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Components.Body;
 import org.frej.bulletheck.Model.Components.Decay;
 import org.frej.bulletheck.Model.Components.Physics;
+import org.frej.bulletheck.Multiplayer.Multiplayer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class World {
 
-	private static final float PALYER_SPEED = 150f;
-	private static final float BULLET_SPEED = 250f;
-	private static final float BULLET_MAX_DISTANCE = 150f;// (Gdx.graphics.getHeight()+Gdx.graphics.getWidth())/2;
+	public static final float PALYER_SPEED = 150f;
+	public static final float BULLET_SPEED = 250f;
+	public static final float BULLET_MAX_DISTANCE = 150f;// (Gdx.graphics.getHeight()+Gdx.graphics.getWidth())/2;
 
 	private Entity player;
 	private Array<Entity> bullets;
+	private Entity enemy;
+	
 	private boolean aWasPressedFirst;
 	private boolean aWasPressed;
 	private boolean wWasPressed;
 	private boolean wWasPressedFirst;
 
+	private TiledMap map;
+	private float unitScale;
+	private TiledMapTileLayer layer;
+	private Multiplayer mp;
+
 	/**
 	 * @param player
 	 */
-	public World() {
+	public World(BulletHeck game) {
 		player = new Entity();
-		player.setBody(new Body(new Vector2(Gdx.graphics.getWidth() / 2,
-				Gdx.graphics.getHeight() / 2), 64, 64));
-		player.setPhysics(new Physics(player, new Vector2(0, 0), PALYER_SPEED));
+		player.setBody(new Body(new Vector2(Gdx.graphics.getWidth(),
+				Gdx.graphics.getHeight()), 64, 64));
+		player.setPhysics(new Physics(player, new Vector2(1280, 720), PALYER_SPEED));
 
 		bullets = new Array<Entity>();
+		enemy = new Entity();		
+		enemy.setBody(new Body(new Vector2(0,0),64,64));
+		
+		map = new TmxMapLoader().load("data/mapka.tmx");
+		layer = (TiledMapTileLayer) map.getLayers().get(0);
+		unitScale = 1 / 32f;
+		mp = new Multiplayer(game.args[0],game.args[1]);
 	}
 
 	/**
@@ -50,14 +69,28 @@ public class World {
 	}
 
 	public void update() {
+		mp.handleMessage();
 		movement();
-		player.getPhysics().update();
+		if (isValidPosition(player.getPhysics().nextPosition())){
+			player.getPhysics().update();
+			mp.sendMessage(Multiplayer.OP_POS+player.getPhysics().nextPosition().x+","+player.getPhysics().nextPosition().y);
+			//mp.sendMessage(Multiplayer.OP_POS+"1280"+","+"720");
+		}
 		for (Entity bullet : bullets) {
 			bullet.getPhysics().update();
 			if (bullet.getDecay().isDecayed())
 				bullets.removeValue(bullet, false);
 		}
+		enemy.getBody().setPosition(mp.getPosition());
 
+	}
+
+	private boolean isValidPosition(Vector2 nextPosition) {
+		boolean isBlocked=layer
+				.getCell((int) (nextPosition.x * unitScale),
+						(int) (nextPosition.y * unitScale)).getTile()
+				.getProperties().containsKey("blocked");	
+		return !isBlocked;
 	}
 
 	private void movement() {
@@ -121,4 +154,10 @@ public class World {
 		return new Vector2((Gdx.graphics.getWidth()) / 2,
 				(Gdx.graphics.getHeight()) / 2);
 	}
+
+	public Entity getEnemy() {
+		return enemy;
+	}
+	
+	
 }
