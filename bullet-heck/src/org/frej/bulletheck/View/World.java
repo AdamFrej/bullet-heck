@@ -3,6 +3,7 @@ package org.frej.bulletheck.View;
 import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Components.Body;
+import org.frej.bulletheck.Model.Components.Bullets;
 import org.frej.bulletheck.Model.Components.Decay;
 import org.frej.bulletheck.Model.Components.Physics;
 import org.frej.bulletheck.Multiplayer.Multiplayer;
@@ -24,6 +25,8 @@ public class World {
 	private Entity player;
 	private Array<Entity> bullets;
 	private Entity enemy;
+	private Bullets bullets2;
+	private Bullets enemyBullets;
 	
 	private boolean aWasPressedFirst;
 	private boolean aWasPressed;
@@ -45,6 +48,9 @@ public class World {
 		player.setPhysics(new Physics(player, new Vector2(1280, 720), PALYER_SPEED));
 
 		bullets = new Array<Entity>();
+		bullets2 = new Bullets();
+		enemyBullets = new Bullets();
+		
 		enemy = new Entity();		
 		enemy.setBody(new Body(new Vector2(0,0),64,64));
 		
@@ -65,7 +71,11 @@ public class World {
 	 * @return wartość bullets
 	 */
 	public Array<Entity> getBullets() {
-		return bullets;
+		Array<Entity> ret = new Array<Entity>();
+		ret.addAll(bullets2.getBullets());
+		ret.addAll(enemyBullets.getBullets());
+		
+		return ret;
 	}
 
 	public void update() {
@@ -73,15 +83,19 @@ public class World {
 		movement();
 		if (isValidPosition(player.getPhysics().nextPosition())){
 			player.getPhysics().update();
-			mp.sendMessage(Multiplayer.OP_POS+player.getPhysics().nextPosition().x+","+player.getPhysics().nextPosition().y);
-			//mp.sendMessage(Multiplayer.OP_POS+"1280"+","+"720");
-		}
+			mp.move(player.getPhysics().nextPosition());
+		}/*
 		for (Entity bullet : bullets) {
 			bullet.getPhysics().update();
 			if (bullet.getDecay().isDecayed())
 				bullets.removeValue(bullet, false);
-		}
+		}*/
+		bullets2.setBulletOrigin(onScreenPosition());
+		bullets2.update();
 		enemy.getBody().setPosition(mp.getPosition());
+		enemyBullets.setBulletOrigin(onScreenPosition(enemy));
+		enemyBullets.addBullet(mp.getBulletVelocity());
+		enemyBullets.update();
 
 	}
 
@@ -134,7 +148,8 @@ public class World {
 		if (Gdx.input.isTouched()) {
 			Vector2 touchPosition = new Vector2(Gdx.input.getX(),
 					Gdx.graphics.getHeight() - Gdx.input.getY());
-			addBullet(touchPosition.sub(onScreenPosition()).nor());
+			bullets2.addBullet(touchPosition.sub(onScreenPosition()).nor());
+			mp.shot(touchPosition);
 		}
 
 	}
@@ -153,6 +168,15 @@ public class World {
 	private Vector2 onScreenPosition() {
 		return new Vector2((Gdx.graphics.getWidth()) / 2,
 				(Gdx.graphics.getHeight()) / 2);
+	}
+	
+	
+	private Vector2 onScreenPosition(Entity entity) {
+		float translatedX = entity.getBody().getX() + (Gdx.graphics.getWidth() - entity.getBody().getWidth()) / 2
+				- player.getBody().getX();
+		float translatedY = entity.getBody().getY() + (Gdx.graphics.getHeight() - entity.getBody().getHeight()) / 2
+				- player.getBody().getY();
+		return new Vector2(translatedX,translatedY);		
 	}
 
 	public Entity getEnemy() {

@@ -141,21 +141,19 @@ public class WorldRenderer {
 		for (Entity bullet : world.getBullets())
 			batch.draw(bulletTexture, bullet.getBody().getX(), bullet.getBody()
 					.getY());
-		batch.draw(enemyTexture, enemyX(), enenmyY());
+		batch.draw(enemyTexture, translateX(enemy.getBody().getX()), translateY(enemy.getBody().getY()));
 		batch.end();
 
 	}
 
-	private float enenmyY() {
-		return enemy.getBody().getY()
-				+ (Gdx.graphics.getHeight() - enemy.getBody().getHeight()) / 2
-				- mapCam.position.y / unitScale;
+	private float translateY(float y) {
+		return y + (Gdx.graphics.getHeight() - enemy.getBody().getHeight()) / 2
+				- player.getBody().getY();
 	}
 
-	private float enemyX() {
-		return enemy.getBody().getX()
-				+ (Gdx.graphics.getWidth() - enemy.getBody().getWidth()) / 2
-				- mapCam.position.x / unitScale;
+	private float translateX(float x) {
+		return x + (Gdx.graphics.getWidth() - enemy.getBody().getWidth()) / 2
+				- player.getBody().getX();
 	}
 
 	public void dispose() {

@@ -25,6 +25,7 @@ public class Multiplayer {
 	private byte[] reciveBuffer;
 	private String message;
 	private Vector2 position;
+	private Vector2 bulletVelocity;
 	
 	private int recvPort;
 	private int sendPort;
@@ -33,6 +34,7 @@ public class Multiplayer {
 		sendBuffer = new byte[1024];
 		reciveBuffer = new byte[1024];
 		position = new Vector2(0, 0);
+		bulletVelocity = new Vector2(0, 0);
 		message = "";
 		this.sendPort = Integer.decode(sendPort);
 		this.recvPort = Integer.decode(recvPort);
@@ -50,7 +52,7 @@ public class Multiplayer {
 		this.peerAdress = peerAdress;
 	}
 
-	public void sendMessage(String message) {
+	private void sendMessage(String message) {
 		try {
 			sendBuffer = message.getBytes("utf-8");
 			packet = new DatagramPacket(sendBuffer, sendBuffer.length,
@@ -79,15 +81,35 @@ public class Multiplayer {
 		}
 		//System.out.println("Otrzymałem: " + message);
 		if (message.contains(OP_POS)) {
-			String[] pos = message.substring(3).split(",");
+			String[] pos = message.substring(OP_POS.length()).split(",");
 			position = new Vector2(Float.parseFloat(pos[0]),
 					Float.parseFloat(pos[1]));
+		}
+		if (message.contains(OP_SHOT)) {
+			String[] vel = message.substring(OP_SHOT.length()).split(",");
+			bulletVelocity = new Vector2(Float.parseFloat(vel[0]),
+					Float.parseFloat(vel[1]));
+		}
+		else {
+			bulletVelocity=new Vector2(0,0);
 		}
 
 	}
 
 	public Vector2 getPosition() {
 		return position;
+	}
+
+	public void shot(Vector2 bulletPosition) {
+		sendMessage(OP_SHOT+bulletPosition.x+","+bulletPosition.y);
+	}
+	public void move(Vector2 newPosition){
+		sendMessage(OP_POS+newPosition.x+","+newPosition.y);
+		
+	}
+
+	public Vector2 getBulletVelocity() {
+		return bulletVelocity;
 	}
 
 }
