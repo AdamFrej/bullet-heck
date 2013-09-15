@@ -4,6 +4,7 @@ import org.frej.bulletheck.Model.Components.Body;
 import org.frej.bulletheck.Model.Components.Decay;
 import org.frej.bulletheck.Model.Components.Physics;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
@@ -15,9 +16,9 @@ public class Bullet extends Entity {
 	private static final float MAX_DISTANCE = 150f;
 	public static final int DAMAGE_VALUE = 1;
 
-	public Bullet(Vector2 position, Vector2 velocity,Array<Entity> targets) {
+	public Bullet(Vector2 position, Vector2 velocity,Array<Entity> targets,TiledMapTileLayer groundColisions) {
 		setBody(new Body(position, WIDTH, HEIGHT));
-		setPhysics(new Physics(this, velocity, SPEED));
+		setPhysics(new Physics(this, velocity, SPEED,groundColisions,true));
 		setDecay(new Decay(this, getBody().getPosition(), MAX_DISTANCE));
 		setTargets(targets);
 	}

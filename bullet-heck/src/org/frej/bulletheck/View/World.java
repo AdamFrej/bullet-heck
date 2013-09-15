@@ -24,10 +24,7 @@ public class World {
 	private boolean wWasPressedFirst;
 	private float bulletTime;
 	private final Vector2 onScreenPosition;
-
-	private TiledMap map;
-	private final float unitScale = 1 / 32f;
-	private TiledMapTileLayer layer;
+	private final TiledMapTileLayer groundColisions;
 
 	public World(BulletHeck game) {
 
@@ -36,19 +33,18 @@ public class World {
 		onScreenPosition = new Vector2((Gdx.graphics.getWidth()) / 2,
 				(Gdx.graphics.getHeight()) / 2);
 
+		TiledMap map = new TmxMapLoader().load("data/mapka.tmx");
+		groundColisions = (TiledMapTileLayer) map.getLayers().get(0);
+
 		entities = new Array<Entity>();
-		mainPlayer = new Player(mainPlayerStartingPosition);
+		mainPlayer = new Player(mainPlayerStartingPosition, groundColisions);
 
 		Vector2 enemyStartingPosition = new Vector2(1200, 500);
-		Entity enemy = new EvilKnight(enemyStartingPosition);
+		Entity enemy = new EvilKnight(enemyStartingPosition, groundColisions);
 		Array<Entity> enemyTargets = new Array<Entity>();
 		enemyTargets.add(mainPlayer);
 		enemy.setTargets(enemyTargets);
 		entities.add(enemy);
-
-		map = new TmxMapLoader().load("data/mapka.tmx");
-		layer = (TiledMapTileLayer) map.getLayers().get(0);
-
 	}
 
 	public Entity getMainPlayer() {
@@ -61,10 +57,9 @@ public class World {
 
 	public void update() {
 		movement();
-		if (isValidPosition(mainPlayer.getPhysics().nextPosition()))
-			mainPlayer.getPhysics().update();
 		mainPlayer.update();
-		if(mainPlayer.isDestroyed()) System.out.println("You are now dead!!!");
+		if (mainPlayer.isDestroyed())
+			System.out.println("You are now dead!!!");
 		mainPlayer.setTargets(entities);
 
 		for (Entity entity : entities) {
@@ -73,15 +68,7 @@ public class World {
 				entities.removeValue(entity, false);
 		}
 	}
-
-	private boolean isValidPosition(Vector2 nextPosition) {
-		boolean isBlocked = layer
-				.getCell((int) (nextPosition.x * unitScale),
-						(int) (nextPosition.y * unitScale)).getTile()
-				.getProperties().containsKey("blocked");
-		return !isBlocked;
-	}
-
+	
 	private void movement() {
 		if (Gdx.input.isKeyPressed(Keys.W)) {
 			mainPlayer.getPhysics().setVelocityY(1);
@@ -130,7 +117,7 @@ public class World {
 						.add(new Bullet(
 								mainPlayer.getBody().getPosition(),
 								touchPosition.cpy().sub(onScreenPosition).nor(),
-								mainPlayer.getTargets()));
+								mainPlayer.getTargets(), groundColisions));
 				bulletTime = 0;
 			}
 		}

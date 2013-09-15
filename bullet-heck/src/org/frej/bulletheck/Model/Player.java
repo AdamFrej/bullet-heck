@@ -5,6 +5,7 @@ import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
 import org.frej.bulletheck.Model.Components.Weapon;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
 public class Player extends Entity{
@@ -15,15 +16,16 @@ public class Player extends Entity{
 	private static final int HIT_POINTS = 100;
 	public static final float BULLETS_TIME = 1/10f;
 
-	public Player(Vector2 position) {
+	public Player(Vector2 position,TiledMapTileLayer groundColisions) {
 		setBody(new Body(position,WIDTH,HEIGHT ));
-		setPhysics(new Physics(this,SPEED));
+		setPhysics(new Physics(this,SPEED,groundColisions));
 		setHealth(new Health(this,HIT_POINTS));
 		setWeapon(new Weapon(this));
 	}
 
 	@Override
 	public void update() {
+		getPhysics().update();
 		getWeapon().update();
 		getHealth().update();
 		

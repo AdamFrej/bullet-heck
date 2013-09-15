@@ -4,6 +4,7 @@ import org.frej.bulletheck.Model.Components.Body;
 import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 
 
@@ -16,9 +17,9 @@ public class EvilKnight extends Entity {
 	private static final float AGRO_RANGE = 300;
 	private static final int DAMAGE_VALUE = 1;
 
-	public EvilKnight(Vector2 position) {
+	public EvilKnight(Vector2 position, TiledMapTileLayer groundColisions) {
 		setBody(new Body(position,WIDTH,HEIGHT));
-		setPhysics(new Physics(this,SPEED));
+		setPhysics(new Physics(this,SPEED,groundColisions));
 		setHealth(new Health(this,HIT_POINTS));
 	}
 	
