@@ -17,12 +17,15 @@ public class Body {
 	
 	
 
-	/**
-	 * @param position
-	 * @param width
-	 * @param height
-	 * @param bounds
-	 */
+	public Body(float width, float height) {
+		position = new Vector2();
+		this.width = width;
+		this.height = height;
+		bounds= new Rectangle(position.x,position.y,width,height);
+		this.face=STOP;
+		
+	}
+	
 	public Body(Vector2 position, float width, float height) {
 		this.position = position;
 		this.width = width;
@@ -34,7 +37,7 @@ public class Body {
 	/**
 	 * @return wartość position
 	 */
-	Vector2 getPosition() {
+	public Vector2 getPosition() {
 		return position.cpy();
 	}
 	

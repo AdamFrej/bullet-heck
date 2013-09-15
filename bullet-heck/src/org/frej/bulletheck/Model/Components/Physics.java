@@ -11,11 +11,11 @@ public class Physics {
 	private float speed;
 	private Entity entity;
 	
-	
-	
-	/**
-	 * @param entity
-	 */
+	public Physics(Entity entity,float speed){
+		this.entity = entity;
+		this.speed=speed;
+		this.velocity = new Vector2();
+	}
 	public Physics(Entity entity,Vector2 velocity, float speed) {
 		this.entity = entity;
 		this.velocity=velocity;

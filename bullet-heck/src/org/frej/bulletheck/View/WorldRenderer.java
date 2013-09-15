@@ -16,17 +16,14 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class WorldRenderer {
 	private World world;
-	private Entity player;
-	private Entity enemy;
+	private Entity mainPlayer;
 
-	private Texture playerTexture;
-	private Texture enemyTexture;
 	private SpriteBatch batch;
 	private Texture bulletTexture;
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private OrthographicCamera mapCam;
-	private float unitScale;
+	private final float unitScale = 1 / 32f;
 
 	private static final int FRAME_COLS = 9;
 	private static final int FRAME_ROWS = 4;
@@ -46,31 +43,46 @@ public class WorldRenderer {
 	private TextureRegion currentFrame;
 	private float stateTime;
 
-	/**
-	 * @param world
-	 */
 	public WorldRenderer(World world) {
 
 		this.world = world;
-		player = world.getPlayer();
-		enemy = world.getEnemy();
+		mainPlayer = world.getMainPlayer();
+		setupMainPlayerAnimation();
 
-		playerTexture = new Texture("data/test.png");// rycerzp.png");
-		enemyTexture = new Texture("data/rycerzp.png");
+		setupMap();
 		bulletTexture = new Texture("data/pocisk.png");
+		batch = new SpriteBatch();
+	}
+	public void render() {
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
+		renderMap();
+
+		setMainPlayerFace();
+
+		batch.begin();
+		batch.draw(currentFrame, (Gdx.graphics.getWidth() - mainPlayer.getBody()
+				.getWidth()) / 2, (Gdx.graphics.getHeight() - mainPlayer.getBody()
+				.getHeight()) / 2);
+		for (Entity entity : world.getEntities())
+			batch.draw(bulletTexture, translateX(entity), translateY(entity));
+		batch.end();
+
+	}
+
+	private void setupMap() {
 		map = new TmxMapLoader().load("data/mapka.tmx");
 
 		mapCam = new OrthographicCamera();
 		mapCam.setToOrtho(false, 40, 22);
 		mapCam.update();
 
-		unitScale = 1 / 32f;
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale);
 		mapRenderer.setView(mapCam);
+	}
 
-		batch = new SpriteBatch();
-
+	private void setupMainPlayerAnimation() {
 		walkSheet = new Texture("data/orcAnimation.png");
 		TextureRegion[][] tmp = TextureRegion.split(walkSheet,
 				walkSheet.getWidth() / FRAME_COLS, walkSheet.getHeight()
@@ -98,22 +110,19 @@ public class WorldRenderer {
 		downAnimation = new Animation(0.1f, downFrames);
 
 		stateTime = 0f;
-
 	}
-
-	public void render() {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-
-		mapCam.position.set(player.getBody().getX() * unitScale, player
+	private void renderMap() {
+		mapCam.position.set(mainPlayer.getBody().getX() * unitScale, mainPlayer
 				.getBody().getY() * unitScale, 0);
 		mapCam.update();
 
 		mapRenderer.setView(mapCam);
 		mapRenderer.render();
+	}
 
+	private void setMainPlayerFace() {
 		stateTime += Gdx.graphics.getDeltaTime();
-		switch (player.getBody().getFace()) {
+		switch (mainPlayer.getBody().getFace()) {
 		case Body.DOWN:
 			currentFrame = downAnimation.getKeyFrame(stateTime, true);
 			break;
@@ -133,31 +142,18 @@ public class WorldRenderer {
 			currentFrame = downAnimation.getKeyFrame(0);
 			break;
 		}
-
-		batch.begin();
-		batch.draw(currentFrame, (Gdx.graphics.getWidth() - player.getBody()
-				.getWidth()) / 2, (Gdx.graphics.getHeight() - player.getBody()
-				.getHeight()) / 2);
-		for (Entity bullet : world.getBullets())
-			batch.draw(bulletTexture, bullet.getBody().getX(), bullet.getBody()
-					.getY());
-		batch.draw(enemyTexture, translateX(enemy.getBody().getX()), translateY(enemy.getBody().getY()));
-		batch.end();
-
 	}
 
-	private float translateY(float y) {
-		return y + (Gdx.graphics.getHeight() - enemy.getBody().getHeight()) / 2
-				- player.getBody().getY();
+	private float translateY(Entity entity) {
+		return entity.getBody().getY() + (Gdx.graphics.getHeight() - entity.getBody().getHeight()) / 2
+				- mainPlayer.getBody().getY();
 	}
 
-	private float translateX(float x) {
-		return x + (Gdx.graphics.getWidth() - enemy.getBody().getWidth()) / 2
-				- player.getBody().getX();
+	private float translateX(Entity entity) {
+		return entity.getBody().getX() + (Gdx.graphics.getWidth() - entity.getBody().getWidth()) / 2
+				- mainPlayer.getBody().getX();
 	}
-
 	public void dispose() {
-		playerTexture.dispose();
 		bulletTexture.dispose();
 		batch.dispose();
 		map.dispose();

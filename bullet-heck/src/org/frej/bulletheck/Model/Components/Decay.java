@@ -36,11 +36,9 @@ public class Decay {
 		this.maxDistance = maxDistance;
 	}
 
-	public boolean isDecayed() {
+	public void update() {
 		if (entity.getBody().getPosition().dst(origin)>maxDistance)
-			return true;
-
-		return false;
+			entity.destroy();
 	}
 
 }

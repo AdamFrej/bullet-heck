@@ -33,16 +33,19 @@ public class Multiplayer {
 	public Multiplayer(String sendPort,String recvPort) {
 		sendBuffer = new byte[1024];
 		reciveBuffer = new byte[1024];
+		
 		position = new Vector2(0, 0);
 		bulletVelocity = new Vector2(0, 0);
+		
 		message = "";
+		
 		this.sendPort = Integer.decode(sendPort);
 		this.recvPort = Integer.decode(recvPort);
 
 		try {
 			sendSocket = new DatagramSocket();
 			recvSocket = new DatagramSocket(this.recvPort);
-			recvSocket.setSoTimeout(100);
+			recvSocket.setSoTimeout(1000);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
