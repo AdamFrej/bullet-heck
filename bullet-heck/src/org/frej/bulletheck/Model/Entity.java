@@ -6,6 +6,8 @@ import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
 import org.frej.bulletheck.Model.Components.Weapon;
 
+import com.badlogic.gdx.utils.Array;
+
 public abstract class Entity implements IEntity {
 
 	private Physics physics;
@@ -13,6 +15,8 @@ public abstract class Entity implements IEntity {
 	private Decay decay;
 	private Health health;
 	private Weapon weapon;
+	private Array<Entity> targets;
+	private Array<Entity> group;
 
 	private boolean destroyed = false;
 
@@ -65,5 +69,23 @@ public abstract class Entity implements IEntity {
 	public void destroy() {
 		destroyed = true;
 	}
+
+	public Array<Entity> getTargets() {
+		return targets;
+	}
+
+	public void setTargets(Array<Entity> targets) {
+		this.targets = targets;
+	}
+
+	public Array<Entity> getGroup() {
+		return group;
+	}
+
+	public void setGroup(Array<Entity> group) {
+		this.group = group;
+	}
+	
+	
 
 }

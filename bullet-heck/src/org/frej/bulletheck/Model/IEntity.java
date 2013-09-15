@@ -6,6 +6,8 @@ import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
 import org.frej.bulletheck.Model.Components.Weapon;
 
+import com.badlogic.gdx.utils.Array;
+
 public interface IEntity {
 	
 	public Body getBody();
@@ -19,9 +21,16 @@ public interface IEntity {
 	public Weapon getWeapon();
 	public void setWeapon(Weapon weapon);
 	
+	
 	public void destroy();
 	public boolean isDestroyed();
 	
 	public void update();
+	
+	public Array<Entity> getTargets();
+	public void setTargets(Array<Entity> targets);
+	
+	public Array<Entity> getGroup();
+	public void setGroup(Array<Entity> group);
 
 }

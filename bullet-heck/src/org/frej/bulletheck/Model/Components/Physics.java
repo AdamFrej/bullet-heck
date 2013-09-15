@@ -69,5 +69,8 @@ public class Physics {
 		velocity.x=x;
 		
 	}
+	public void setVelocity(Vector2 velocity) {
+		this.velocity=velocity;		
+	}
 	
 }

@@ -2,7 +2,7 @@ package org.frej.bulletheck.View;
 
 import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Bullet;
-import org.frej.bulletheck.Model.Enemy;
+import org.frej.bulletheck.Model.EvilKnight;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Player;
 
@@ -40,7 +40,11 @@ public class World {
 		mainPlayer = new Player(mainPlayerStartingPosition);
 
 		Vector2 enemyStartingPosition = new Vector2(1200, 500);
-		entities.add(new Enemy(enemyStartingPosition));
+		Entity enemy = new EvilKnight(enemyStartingPosition);
+		Array<Entity> enemyTargets = new Array<Entity>();
+		enemyTargets.add(mainPlayer);
+		enemy.setTargets(enemyTargets);
+		entities.add(enemy);
 
 		map = new TmxMapLoader().load("data/mapka.tmx");
 		layer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -58,20 +62,10 @@ public class World {
 	public void update() {
 		movement();
 		if (isValidPosition(mainPlayer.getPhysics().nextPosition()))
-			mainPlayer.update();
-
-		for (Entity bullet : mainPlayer.getWeapon().getBullets()) {
-			for (Entity entity : entities)
-				if (bullet.getBody().getBounds()
-						.overlaps(entity.getBody().getBounds())) {
-					entity.getHealth().damage(Bullet.DAMAGE_VALUE);
-					bullet.destroy();
-				}
-
-			if (bullet.isDestroyed())
-				mainPlayer.getWeapon().removeValue(bullet, false);
-
-		}
+			mainPlayer.getPhysics().update();
+		mainPlayer.update();
+		if(mainPlayer.isDestroyed()) System.out.println("You are now dead!!!");
+		mainPlayer.setTargets(entities);
 
 		for (Entity entity : entities) {
 			entity.update();
@@ -133,8 +127,10 @@ public class World {
 			if (bulletTime >= Player.BULLETS_TIME) {
 				mainPlayer
 						.getWeapon()
-						.add(new Bullet(mainPlayer.getBody().getPosition(),
-								touchPosition.cpy().sub(onScreenPosition).nor()));
+						.add(new Bullet(
+								mainPlayer.getBody().getPosition(),
+								touchPosition.cpy().sub(onScreenPosition).nor(),
+								mainPlayer.getTargets()));
 				bulletTime = 0;
 			}
 		}

@@ -24,8 +24,8 @@ public class Player extends Entity{
 
 	@Override
 	public void update() {
-		getPhysics().update();
 		getWeapon().update();
+		getHealth().update();
 		
 	}
 }

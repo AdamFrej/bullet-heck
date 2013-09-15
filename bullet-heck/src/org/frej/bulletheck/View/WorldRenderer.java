@@ -1,7 +1,7 @@
 package org.frej.bulletheck.View;
 
 import org.frej.bulletheck.Model.Bullet;
-import org.frej.bulletheck.Model.Enemy;
+import org.frej.bulletheck.Model.EvilKnight;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Components.Body;
 
@@ -84,7 +84,7 @@ public class WorldRenderer {
 	private Texture getTexture(Entity entity) {
 		if (entity instanceof Bullet)
 			return bulletTexture;
-		if (entity instanceof Enemy)
+		if (entity instanceof EvilKnight)
 			return enemyTexture;
 		return null;
 	}
