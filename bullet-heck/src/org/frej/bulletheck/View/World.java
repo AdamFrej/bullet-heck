@@ -1,7 +1,10 @@
 package org.frej.bulletheck.View;
 
+import java.util.Iterator;
+
 import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Bullet;
+import org.frej.bulletheck.Model.Enemy;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Player;
 
@@ -21,6 +24,7 @@ public class World {
 	private boolean aWasPressed;
 	private boolean wWasPressed;
 	private boolean wWasPressedFirst;
+	private float bulletTime;
 
 	private TiledMap map;
 	private final float unitScale = 1 / 32f;
@@ -33,6 +37,9 @@ public class World {
 
 		entities = new Array<Entity>();
 		mainPlayer = new Player(mainPlayerStartingPosition);
+
+		Vector2 enemyStartingPosition = new Vector2(2000, 2000);
+		entities.add(new Enemy(enemyStartingPosition));
 
 		map = new TmxMapLoader().load("data/mapka.tmx");
 		layer = (TiledMapTileLayer) map.getLayers().get(0);
@@ -56,6 +63,7 @@ public class World {
 			if (entity.isDestroyed())
 				entities.removeValue(entity, false);
 		}
+
 	}
 
 	private boolean isValidPosition(Vector2 nextPosition) {
@@ -107,8 +115,12 @@ public class World {
 		if (Gdx.input.isTouched()) {
 			Vector2 touchPosition = new Vector2(Gdx.input.getX(),
 					Gdx.graphics.getHeight() - Gdx.input.getY());
-			entities.add(new Bullet(mainPlayer.getBody().getPosition(),
-					touchPosition.sub(onScreenPosition()).nor()));
+			bulletTime += Gdx.graphics.getDeltaTime();
+			if (bulletTime >= Player.BULLETS_TIME) {
+				entities.add(new Bullet(mainPlayer.getBody().getPosition(),
+						touchPosition.sub(onScreenPosition()).nor()));
+				bulletTime = 0;
+			}
 		}
 
 	}

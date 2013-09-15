@@ -12,6 +12,7 @@ public class Bullet extends Entity {
 	private static final float HEIGHT = 8;
 	private static final float SPEED = 250f;
 	private static final float MAX_DISTANCE = 150f;
+	public static final int DAMAGE_VALUE = 1;
 
 	public Bullet(Vector2 position,Vector2 velocity) {
 		setBody(new Body(position,WIDTH,HEIGHT ));

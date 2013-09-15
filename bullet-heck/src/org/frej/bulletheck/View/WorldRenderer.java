@@ -1,5 +1,7 @@
 package org.frej.bulletheck.View;
 
+import org.frej.bulletheck.Model.Bullet;
+import org.frej.bulletheck.Model.Enemy;
 import org.frej.bulletheck.Model.Entity;
 import org.frej.bulletheck.Model.Components.Body;
 
@@ -15,11 +17,12 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 public class WorldRenderer {
-	private World world;
-	private Entity mainPlayer;
+	private final World world;
+	private final Entity mainPlayer;
 
-	private SpriteBatch batch;
-	private Texture bulletTexture;
+	private final SpriteBatch batch;
+	private final Texture bulletTexture;
+	private final Texture enemyTexture;
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private OrthographicCamera mapCam;
@@ -51,6 +54,7 @@ public class WorldRenderer {
 
 		setupMap();
 		bulletTexture = new Texture("data/pocisk.png");
+		enemyTexture = new Texture("data/rycerzp.png");
 		batch = new SpriteBatch();
 	}
 	public void render() {
@@ -66,11 +70,18 @@ public class WorldRenderer {
 				.getWidth()) / 2, (Gdx.graphics.getHeight() - mainPlayer.getBody()
 				.getHeight()) / 2);
 		for (Entity entity : world.getEntities())
-			batch.draw(bulletTexture, translateX(entity), translateY(entity));
+			batch.draw(getTexture(entity), translateX(entity), translateY(entity));
 		batch.end();
 
 	}
 
+	private Texture getTexture(Entity entity) {
+		if(entity instanceof Bullet)
+			return bulletTexture;
+		if(entity instanceof Enemy)
+			return enemyTexture;
+		return null;
+	}
 	private void setupMap() {
 		map = new TmxMapLoader().load("data/mapka.tmx");
 
