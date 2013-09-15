@@ -57,6 +57,7 @@ public class WorldRenderer {
 		enemyTexture = new Texture("data/rycerzp.png");
 		batch = new SpriteBatch();
 	}
+
 	public void render() {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -66,22 +67,28 @@ public class WorldRenderer {
 		setMainPlayerFace();
 
 		batch.begin();
-		batch.draw(currentFrame, (Gdx.graphics.getWidth() - mainPlayer.getBody()
-				.getWidth()) / 2, (Gdx.graphics.getHeight() - mainPlayer.getBody()
-				.getHeight()) / 2);
+		batch.draw(
+				currentFrame,
+				(Gdx.graphics.getWidth() - mainPlayer.getBody().getWidth()) / 2,
+				(Gdx.graphics.getHeight() - mainPlayer.getBody().getHeight()) / 2);
+		for (Entity bullet : mainPlayer.getWeapon().getBullets())
+			batch.draw(getTexture(bullet), translateX(bullet),
+					translateY(bullet));
 		for (Entity entity : world.getEntities())
-			batch.draw(getTexture(entity), translateX(entity), translateY(entity));
+			batch.draw(getTexture(entity), translateX(entity),
+					translateY(entity));
 		batch.end();
 
 	}
 
 	private Texture getTexture(Entity entity) {
-		if(entity instanceof Bullet)
+		if (entity instanceof Bullet)
 			return bulletTexture;
-		if(entity instanceof Enemy)
+		if (entity instanceof Enemy)
 			return enemyTexture;
 		return null;
 	}
+
 	private void setupMap() {
 		map = new TmxMapLoader().load("data/mapka.tmx");
 
@@ -122,6 +129,7 @@ public class WorldRenderer {
 
 		stateTime = 0f;
 	}
+
 	private void renderMap() {
 		mapCam.position.set(mainPlayer.getBody().getX() * unitScale, mainPlayer
 				.getBody().getY() * unitScale, 0);
@@ -156,14 +164,17 @@ public class WorldRenderer {
 	}
 
 	private float translateY(Entity entity) {
-		return entity.getBody().getY() + (Gdx.graphics.getHeight() - entity.getBody().getHeight()) / 2
+		return entity.getBody().getY()
+				+ (Gdx.graphics.getHeight() - entity.getBody().getHeight()) / 2
 				- mainPlayer.getBody().getY();
 	}
 
 	private float translateX(Entity entity) {
-		return entity.getBody().getX() + (Gdx.graphics.getWidth() - entity.getBody().getWidth()) / 2
+		return entity.getBody().getX()
+				+ (Gdx.graphics.getWidth() - entity.getBody().getWidth()) / 2
 				- mainPlayer.getBody().getX();
 	}
+
 	public void dispose() {
 		bulletTexture.dispose();
 		batch.dispose();

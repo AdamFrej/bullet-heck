@@ -4,6 +4,7 @@ import org.frej.bulletheck.Model.Components.Body;
 import org.frej.bulletheck.Model.Components.Decay;
 import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
+import org.frej.bulletheck.Model.Components.Weapon;
 
 public abstract class Entity implements IEntity {
 
@@ -11,6 +12,7 @@ public abstract class Entity implements IEntity {
 	private Body body;
 	private Decay decay;
 	private Health health;
+	private Weapon weapon;
 
 	private boolean destroyed = false;
 
@@ -44,6 +46,14 @@ public abstract class Entity implements IEntity {
 
 	public void setHealth(Health health) {
 		this.health = health;
+	}
+
+	public Weapon getWeapon() {
+		return weapon;
+	}
+
+	public void setWeapon(Weapon weapon) {
+		this.weapon = weapon;
 	}
 
 	public abstract void update();

@@ -4,6 +4,7 @@ import org.frej.bulletheck.Model.Components.Body;
 import org.frej.bulletheck.Model.Components.Decay;
 import org.frej.bulletheck.Model.Components.Health;
 import org.frej.bulletheck.Model.Components.Physics;
+import org.frej.bulletheck.Model.Components.Weapon;
 
 public interface IEntity {
 	
@@ -15,6 +16,8 @@ public interface IEntity {
 	public void setDecay(Decay decay);
 	public Health getHealth();
 	public void setHealth(Health health);
+	public Weapon getWeapon();
+	public void setWeapon(Weapon weapon);
 	
 	public void destroy();
 	public boolean isDestroyed();

@@ -1,7 +1,5 @@
 package org.frej.bulletheck.View;
 
-import java.util.Iterator;
-
 import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Bullet;
 import org.frej.bulletheck.Model.Enemy;
@@ -25,6 +23,7 @@ public class World {
 	private boolean wWasPressed;
 	private boolean wWasPressedFirst;
 	private float bulletTime;
+	private final Vector2 onScreenPosition;
 
 	private TiledMap map;
 	private final float unitScale = 1 / 32f;
@@ -34,15 +33,18 @@ public class World {
 
 		Vector2 mainPlayerStartingPosition = new Vector2(
 				Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		onScreenPosition = new Vector2((Gdx.graphics.getWidth()) / 2,
+				(Gdx.graphics.getHeight()) / 2);
 
 		entities = new Array<Entity>();
 		mainPlayer = new Player(mainPlayerStartingPosition);
 
-		Vector2 enemyStartingPosition = new Vector2(2000, 2000);
+		Vector2 enemyStartingPosition = new Vector2(1200, 500);
 		entities.add(new Enemy(enemyStartingPosition));
 
 		map = new TmxMapLoader().load("data/mapka.tmx");
 		layer = (TiledMapTileLayer) map.getLayers().get(0);
+
 	}
 
 	public Entity getMainPlayer() {
@@ -56,14 +58,26 @@ public class World {
 	public void update() {
 		movement();
 		if (isValidPosition(mainPlayer.getPhysics().nextPosition()))
-			mainPlayer.getPhysics().update();
+			mainPlayer.update();
+
+		for (Entity bullet : mainPlayer.getWeapon().getBullets()) {
+			for (Entity entity : entities)
+				if (bullet.getBody().getBounds()
+						.overlaps(entity.getBody().getBounds())) {
+					entity.getHealth().damage(Bullet.DAMAGE_VALUE);
+					bullet.destroy();
+				}
+
+			if (bullet.isDestroyed())
+				mainPlayer.getWeapon().removeValue(bullet, false);
+
+		}
 
 		for (Entity entity : entities) {
 			entity.update();
 			if (entity.isDestroyed())
 				entities.removeValue(entity, false);
 		}
-
 	}
 
 	private boolean isValidPosition(Vector2 nextPosition) {
@@ -117,16 +131,13 @@ public class World {
 					Gdx.graphics.getHeight() - Gdx.input.getY());
 			bulletTime += Gdx.graphics.getDeltaTime();
 			if (bulletTime >= Player.BULLETS_TIME) {
-				entities.add(new Bullet(mainPlayer.getBody().getPosition(),
-						touchPosition.sub(onScreenPosition()).nor()));
+				mainPlayer
+						.getWeapon()
+						.add(new Bullet(mainPlayer.getBody().getPosition(),
+								touchPosition.cpy().sub(onScreenPosition).nor()));
 				bulletTime = 0;
 			}
 		}
 
-	}
-
-	private Vector2 onScreenPosition() {
-		return new Vector2((Gdx.graphics.getWidth()) / 2,
-				(Gdx.graphics.getHeight()) / 2);
 	}
 }
