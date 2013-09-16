@@ -24,11 +24,11 @@ public class Bullet extends Entity {
 	}
 
 	@Override
-	public void update() {
-		getPhysics().update();
+	public void update(Array<Entity> entities) {
+		getPhysics().update(entities);
 		getDecay().update();
 		for (Entity target : getTargets()) {
-			if (getBody().getBounds().overlaps(target.getBody().getBounds())) {
+			if (getPhysics().nextBounds().overlaps(target.getBody().getBounds())) {
 				target.getHealth().damage(DAMAGE_VALUE);
 				destroy();
 			}

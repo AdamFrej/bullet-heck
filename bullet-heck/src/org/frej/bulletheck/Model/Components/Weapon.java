@@ -13,9 +13,9 @@ public class Weapon {
 		this.bullets = new Array<Entity>();
 	}
 
-	public void update() {
+	public void update(Array<Entity> entities) {
 		for (Entity bullet : bullets) {
-			bullet.update();
+			bullet.update(entities);
 			if (bullet.isDestroyed())
 				bullets.removeValue(bullet, false);
 		}

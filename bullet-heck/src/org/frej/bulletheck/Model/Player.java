@@ -7,6 +7,7 @@ import org.frej.bulletheck.Model.Components.Weapon;
 
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Player extends Entity{
 
@@ -24,9 +25,9 @@ public class Player extends Entity{
 	}
 
 	@Override
-	public void update() {
-		getPhysics().update();
-		getWeapon().update();
+	public void update(Array<Entity> entities) {
+		getPhysics().update(entities);
+		getWeapon().update(entities);
 		getHealth().update();
 		
 	}

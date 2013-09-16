@@ -25,7 +25,7 @@ public interface IEntity {
 	public void destroy();
 	public boolean isDestroyed();
 	
-	public void update();
+	public void update(Array<Entity> entities);
 	
 	public Array<Entity> getTargets();
 	public void setTargets(Array<Entity> targets);

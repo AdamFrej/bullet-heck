@@ -4,7 +4,9 @@ import org.frej.bulletheck.Model.Entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Physics {
 
@@ -41,8 +43,8 @@ public class Physics {
 		this.destroyedOnColison = destroyedOnColison;
 	}
 
-	public void update() {
-		if (isValidPosition(nextPosition()))
+	public void update(Array<Entity> entities) {
+		if (isValidPosition(entities))
 			entity.getBody().setPosition(nextPosition());
 		else if (destroyedOnColison)
 			entity.destroy();
@@ -81,11 +83,26 @@ public class Physics {
 		this.velocity = velocity;
 	}
 
-	private boolean isValidPosition(Vector2 nextPosition) {
+	private boolean isValidPosition(Array<Entity> entities) {
 		boolean isBlocked = groundColisions
-				.getCell((int) (nextPosition.x * unitScale),
-						(int) (nextPosition.y * unitScale)).getTile()
+				.getCell((int) (nextPosition().x * unitScale),
+						(int) (nextPosition().y * unitScale)).getTile()
 				.getProperties().containsKey("blocked");
-		return !isBlocked;
+		boolean colidesWithOtherEntity = false;
+		for (Entity entity : entities)
+			if (!entity.equals(this.entity)
+					&& entity.getBody().getBounds().overlaps(nextBounds()))
+				colidesWithOtherEntity = true;
+
+		return !isBlocked && !colidesWithOtherEntity;
+	}
+
+	public Rectangle nextBounds() {
+		return new Rectangle(nextPosition().x, nextPosition().y, this.entity
+				.getBody().getWidth(), this.entity.getBody().getHeight());
+	}
+
+	public Vector2 getVelocity() {
+		return velocity.cpy();
 	}
 }

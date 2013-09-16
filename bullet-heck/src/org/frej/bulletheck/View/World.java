@@ -39,7 +39,7 @@ public class World {
 		entities = new Array<Entity>();
 		mainPlayer = new Player(mainPlayerStartingPosition, groundColisions);
 
-		Vector2 enemyStartingPosition = new Vector2(1200, 500);
+		Vector2 enemyStartingPosition = new Vector2(1000, 600);
 		Entity enemy = new EvilKnight(enemyStartingPosition, groundColisions);
 		Array<Entity> enemyTargets = new Array<Entity>();
 		enemyTargets.add(mainPlayer);
@@ -57,18 +57,25 @@ public class World {
 
 	public void update() {
 		movement();
-		mainPlayer.update();
+		mainPlayer.update(entities);
 		if (mainPlayer.isDestroyed())
 			System.out.println("You are now dead!!!");
 		mainPlayer.setTargets(entities);
 
 		for (Entity entity : entities) {
-			entity.update();
+			entity.update(mainPlayerAndEntities());
 			if (entity.isDestroyed())
 				entities.removeValue(entity, false);
 		}
 	}
 	
+	private Array<Entity> mainPlayerAndEntities() {
+		Array<Entity> ret =  new Array<Entity>();
+		ret.add(mainPlayer);
+		ret.addAll(entities);
+		return ret;
+	}
+
 	private void movement() {
 		if (Gdx.input.isKeyPressed(Keys.W)) {
 			mainPlayer.getPhysics().setVelocityY(1);

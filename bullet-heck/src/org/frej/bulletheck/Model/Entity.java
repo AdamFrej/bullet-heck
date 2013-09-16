@@ -60,7 +60,7 @@ public abstract class Entity implements IEntity {
 		this.weapon = weapon;
 	}
 
-	public abstract void update();
+	public abstract void update(Array<Entity> entities);
 
 	public boolean isDestroyed() {
 		return destroyed;
