@@ -1,5 +1,6 @@
 package org.frej.bulletheck.Model.Components;
 
+import org.frej.bulletheck.Model.Bullet;
 import org.frej.bulletheck.Model.Entity;
 
 import com.badlogic.gdx.Gdx;
@@ -90,7 +91,7 @@ public class Physics {
 				.getProperties().containsKey("blocked");
 		boolean colidesWithOtherEntity = false;
 		for (Entity entity : entities)
-			if (!entity.equals(this.entity)
+			if (!(this.entity instanceof Bullet) && !entity.equals(this.entity)
 					&& entity.getBody().getBounds().overlaps(nextBounds()))
 				colidesWithOtherEntity = true;
 

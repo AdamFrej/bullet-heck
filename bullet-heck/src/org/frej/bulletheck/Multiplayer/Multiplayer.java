@@ -5,56 +5,56 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 
 import com.badlogic.gdx.math.Vector2;
 
 public class Multiplayer {
-	public static final int PORT = 9000;
+	private static final int BUFFER_SIZE = 1024;
 	public static final String OP_SHOT = "SHOT";
 	public static final String OP_DIE = "DIE";
 	public static final String OP_POS = "POS";
 
 	private DatagramSocket sendSocket;
-	private DatagramSocket recvSocket;
+	private DatagramChannel recvChannel;
 
 	private DatagramPacket packet;
-	private String peerAdress = "localhost";
+	private final String peerAdress;
 	private byte[] sendBuffer;
-	private byte[] reciveBuffer;
+	private byte[] recvBuffer;
 	private String message;
 	private Vector2 position;
 	private Vector2 bulletVelocity;
-	
-	private int recvPort;
-	private int sendPort;
+	private ByteBuffer byteBuffer;
 
-	public Multiplayer(String sendPort,String recvPort) {
-		sendBuffer = new byte[1024];
-		reciveBuffer = new byte[1024];
-		
+	private final int recvPort;
+	private final int sendPort;
+
+	public Multiplayer(String sendPort, String recvPort, String ip) {
+		sendBuffer = new byte[BUFFER_SIZE];
+		recvBuffer = new byte[BUFFER_SIZE];
+
 		position = new Vector2(0, 0);
 		bulletVelocity = new Vector2(0, 0);
-		
-		message = "";
-		
+
 		this.sendPort = Integer.decode(sendPort);
 		this.recvPort = Integer.decode(recvPort);
+		peerAdress = ip;
 
 		try {
 			sendSocket = new DatagramSocket();
-			recvSocket = new DatagramSocket(this.recvPort);
-			recvSocket.setSoTimeout(1000);
-		} catch (SocketException e) {
+			recvChannel = DatagramChannel.open();
+			recvChannel.configureBlocking(false);
+			recvChannel.bind(new InetSocketAddress(this.recvPort));
+			byteBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void setPeerAdress(String peerAdress) {
-		this.peerAdress = peerAdress;
-	}
-
 	private void sendMessage(String message) {
 		try {
 			sendBuffer = message.getBytes("utf-8");
@@ -68,21 +68,54 @@ public class Multiplayer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		//System.out.println("Wysłałem: " + message);
 	}
 
 	public void handleMessage() {
 		try {
-			reciveBuffer = new byte[1024];
-			packet = new DatagramPacket(reciveBuffer, reciveBuffer.length);
-			recvSocket.receive(packet);
-			message = new String(packet.getData(), "utf-8");
+			if (!recvChannel.isConnected()) {
+				connectToOtherPlayer();
+			} else {
+				int recvBytes = 1;
+				while (recvBytes != 0) {
+					recvBytes = recvChannel.read(byteBuffer);
+					readBuffer();
+					decodeMessage();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void connectToOtherPlayer() {
+		SocketAddress otherPlayer;
+		try {
+			otherPlayer = recvChannel.receive(byteBuffer);
+			byteBuffer.clear();
+			if (otherPlayer != null)
+				recvChannel.connect(otherPlayer);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readBuffer() {
+		byteBuffer.flip();
+		int i = 0;
+		while (byteBuffer.hasRemaining()) {
+			recvBuffer[i] = byteBuffer.get();
+			i++;
+		}
+		byteBuffer.clear();
+	}
+
+	private void decodeMessage() {
+		try {
+			message = new String(recvBuffer, "utf-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
 		}
-		//System.out.println("Otrzymałem: " + message);
 		if (message.contains(OP_POS)) {
 			String[] pos = message.substring(OP_POS.length()).split(",");
 			position = new Vector2(Float.parseFloat(pos[0]),
@@ -93,26 +126,26 @@ public class Multiplayer {
 			bulletVelocity = new Vector2(Float.parseFloat(vel[0]),
 					Float.parseFloat(vel[1]));
 		}
-		else {
-			bulletVelocity=new Vector2(0,0);
-		}
-
+		recvBuffer = new byte[BUFFER_SIZE];
 	}
 
 	public Vector2 getPosition() {
 		return position;
 	}
 
-	public void shot(Vector2 bulletPosition) {
-		sendMessage(OP_SHOT+bulletPosition.x+","+bulletPosition.y);
+	public void shot(Vector2 bulletVelocity) {
+		sendMessage(OP_SHOT + bulletVelocity.x + "," + bulletVelocity.y);
 	}
-	public void move(Vector2 newPosition){
-		sendMessage(OP_POS+newPosition.x+","+newPosition.y);
-		
+
+	public void move(Vector2 newPosition) {
+		sendMessage(OP_POS + newPosition.x + "," + newPosition.y);
+
 	}
 
 	public Vector2 getBulletVelocity() {
-		return bulletVelocity;
+		Vector2 ret = bulletVelocity;
+		bulletVelocity = new Vector2(0, 0);
+		return ret;
 	}
 
 }

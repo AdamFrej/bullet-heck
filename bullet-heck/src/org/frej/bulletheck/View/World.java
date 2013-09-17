@@ -2,9 +2,10 @@ package org.frej.bulletheck.View;
 
 import org.frej.bulletheck.BulletHeck;
 import org.frej.bulletheck.Model.Bullet;
-import org.frej.bulletheck.Model.EvilKnight;
 import org.frej.bulletheck.Model.Entity;
+import org.frej.bulletheck.Model.EvilKnight;
 import org.frej.bulletheck.Model.Player;
+import org.frej.bulletheck.Multiplayer.Multiplayer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -26,7 +27,15 @@ public class World {
 	private final Vector2 onScreenPosition;
 	private final TiledMapTileLayer groundColisions;
 
+	private Multiplayer mp;
+	private Array<Entity> enemyTargets;
+
 	public World(BulletHeck game) {
+
+		if (game.args.length == 3)
+			mp = new Multiplayer(game.args[0], game.args[1], game.args[2]);
+		else
+			mp = new Multiplayer(game.args[0], game.args[1], "localhost");
 
 		Vector2 mainPlayerStartingPosition = new Vector2(
 				Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -34,6 +43,7 @@ public class World {
 				(Gdx.graphics.getHeight()) / 2);
 
 		TiledMap map = new TmxMapLoader().load("data/mapka.tmx");
+		map.dispose();
 		groundColisions = (TiledMapTileLayer) map.getLayers().get(0);
 
 		entities = new Array<Entity>();
@@ -41,10 +51,16 @@ public class World {
 
 		Vector2 enemyStartingPosition = new Vector2(1000, 600);
 		Entity enemy = new EvilKnight(enemyStartingPosition, groundColisions);
-		Array<Entity> enemyTargets = new Array<Entity>();
+		enemyTargets = new Array<Entity>();
 		enemyTargets.add(mainPlayer);
 		enemy.setTargets(enemyTargets);
-		entities.add(enemy);
+		//entities.add(enemy);
+
+		Vector2 otherPlayerStartingPosition = new Vector2(1000, 1600);
+		Entity otherPlayer = new Player(otherPlayerStartingPosition,
+				groundColisions);
+		otherPlayer.setTargets(enemyTargets);
+		entities.add(otherPlayer);
 	}
 
 	public Entity getMainPlayer() {
@@ -56,21 +72,32 @@ public class World {
 	}
 
 	public void update() {
+		mp.handleMessage();
 		movement();
 		mainPlayer.update(entities);
 		if (mainPlayer.isDestroyed())
 			System.out.println("You are now dead!!!");
 		mainPlayer.setTargets(entities);
+		mp.move(mainPlayer.getBody().getPosition());
 
 		for (Entity entity : entities) {
 			entity.update(mainPlayerAndEntities());
+			if (entity instanceof Player) {
+				entity.getBody().setPosition(mp.getPosition());
+				Vector2 bulletVelocity = mp.getBulletVelocity();
+				if (bulletVelocity.x != 0 || bulletVelocity.y != 0)
+					entity.getWeapon().add(
+							new Bullet(entity.getBody().getPosition(),
+									bulletVelocity, enemyTargets,
+									groundColisions));
+			}
 			if (entity.isDestroyed())
 				entities.removeValue(entity, false);
 		}
 	}
-	
+
 	private Array<Entity> mainPlayerAndEntities() {
-		Array<Entity> ret =  new Array<Entity>();
+		Array<Entity> ret = new Array<Entity>();
 		ret.add(mainPlayer);
 		ret.addAll(entities);
 		return ret;
@@ -125,6 +152,7 @@ public class World {
 								mainPlayer.getBody().getPosition(),
 								touchPosition.cpy().sub(onScreenPosition).nor(),
 								mainPlayer.getTargets(), groundColisions));
+				mp.shot(touchPosition.cpy().sub(onScreenPosition).nor());
 				bulletTime = 0;
 			}
 		}

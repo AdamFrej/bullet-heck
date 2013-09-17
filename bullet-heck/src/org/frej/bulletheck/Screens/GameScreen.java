@@ -12,12 +12,6 @@ public class GameScreen implements Screen {
 	private World world;
 	private WorldRenderer wr;
 	
-	
-	
-	/**
-	 * @param world
-	 * @param wr
-	 */
 	public GameScreen(BulletHeck game) {
 		this.world = new World(game);
 		this.wr = new WorldRenderer(world);

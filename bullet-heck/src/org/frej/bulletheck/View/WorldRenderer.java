@@ -1,8 +1,9 @@
 package org.frej.bulletheck.View;
 
 import org.frej.bulletheck.Model.Bullet;
-import org.frej.bulletheck.Model.EvilKnight;
 import org.frej.bulletheck.Model.Entity;
+import org.frej.bulletheck.Model.EvilKnight;
+import org.frej.bulletheck.Model.Player;
 import org.frej.bulletheck.Model.Components.Body;
 
 import com.badlogic.gdx.Gdx;
@@ -23,6 +24,7 @@ public class WorldRenderer {
 	private final SpriteBatch batch;
 	private final Texture bulletTexture;
 	private final Texture enemyTexture;
+	private final Texture playerTexture;
 	private TiledMap map;
 	private OrthogonalTiledMapRenderer mapRenderer;
 	private OrthographicCamera mapCam;
@@ -54,7 +56,8 @@ public class WorldRenderer {
 
 		setupMap();
 		bulletTexture = new Texture("data/pocisk.png");
-		enemyTexture = new Texture("data/rycerzp.png");
+		enemyTexture = new Texture("data/kret.png");
+		playerTexture = new Texture("data/rycerzp.png");
 		batch = new SpriteBatch();
 	}
 
@@ -74,9 +77,14 @@ public class WorldRenderer {
 		for (Entity bullet : mainPlayer.getWeapon().getBullets())
 			batch.draw(getTexture(bullet), translateX(bullet),
 					translateY(bullet));
-		for (Entity entity : world.getEntities())
+		for (Entity entity : world.getEntities()) {
 			batch.draw(getTexture(entity), translateX(entity),
 					translateY(entity));
+			if (entity.getWeapon() != null)
+				for (Entity bullet : entity.getWeapon().getBullets())
+					batch.draw(getTexture(bullet), translateX(bullet),
+							translateY(bullet));
+		}
 		batch.end();
 
 	}
@@ -86,6 +94,8 @@ public class WorldRenderer {
 			return bulletTexture;
 		if (entity instanceof EvilKnight)
 			return enemyTexture;
+		if (entity instanceof Player)
+			return playerTexture;
 		return null;
 	}
 
@@ -177,6 +187,7 @@ public class WorldRenderer {
 
 	public void dispose() {
 		bulletTexture.dispose();
+		enemyTexture.dispose();
 		batch.dispose();
 		map.dispose();
 		mapRenderer.dispose();
